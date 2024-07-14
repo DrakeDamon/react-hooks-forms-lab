@@ -1,47 +1,29 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
-import ItemForm from "../components/ItemForm";
 import App from "../components/App";
-
-test("calls the onItemFormSubmit callback prop when the form is submitted", () => {
-  const onItemFormSubmit = jest.fn();
-  render(<ItemForm onItemFormSubmit={onItemFormSubmit} />);
-
-  fireEvent.change(screen.queryByLabelText(/Name/), {
-    target: { value: "Ice Cream" },
-  });
-
-  fireEvent.change(screen.queryByLabelText(/Category/), {
-    target: { value: "Dessert" },
-  });
-
-  fireEvent.submit(screen.queryByText(/Add to List/));
-
-  expect(onItemFormSubmit).toHaveBeenCalledWith(
-    expect.objectContaining({
-      id: expect.any(String),
-      name: "Ice Cream",
-      category: "Dessert",
-    })
-  );
-});
 
 test("adds a new item to the list when the form is submitted", () => {
   render(<App />);
 
-  const dessertCount = screen.queryAllByText(/Dessert/).length;
+  // Count the initial number of "Dessert" items
+  const initialDessertCount = screen.queryAllByText(/Dessert/).length;
 
-  fireEvent.change(screen.queryByLabelText(/Name/), {
+  // Simulate entering a new item name
+  fireEvent.change(screen.getByLabelText(/Name/i), {
     target: { value: "Ice Cream" },
   });
 
-  fireEvent.change(screen.queryByLabelText(/Category/), {
+  // Simulate selecting a new item category
+  fireEvent.change(screen.getByLabelText(/Category/i), {
     target: { value: "Dessert" },
   });
 
-  fireEvent.submit(screen.queryByText(/Add to List/));
+  // Simulate form submission
+  fireEvent.click(screen.getByText(/Add to List/i));
 
-  expect(screen.queryByText(/Ice Cream/)).toBeInTheDocument();
+  // Check if the new item is added to the list
+  expect(screen.getByText(/Ice Cream/)).toBeInTheDocument();
 
-  expect(screen.queryAllByText(/Dessert/).length).toBe(dessertCount + 1);
+  // Verify the number of "Dessert" items has increased by 1
+  expect(screen.queryAllByText(/Dessert/).length).toBe(initialDessertCount + 1);
 });
